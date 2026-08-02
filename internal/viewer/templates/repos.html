@@ -12,7 +12,11 @@
 <main>
 <h2>Repositories</h2>
 {{if .Repos}}
-<table class="table">
+<div class="search-container" style="margin-bottom: 1rem;">
+    <input type="text" id="repoSearch" placeholder="Search repositories..." 
+           style="width: 100%; padding: 0.5rem; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+</div>
+<table class="table" id="reposTable">
     <thead><tr><th>Repository</th><th>Sessions</th><th>Last Modified</th></tr></thead>
     <tbody>
     {{range .Repos}}
@@ -24,6 +28,31 @@
     {{end}}
     </tbody>
 </table>
+<p id="noResults" style="display: none; text-align: center; padding: 1rem; color: #888;">No repositories found matching your search.</p>
+<script>
+(function() {
+    var searchInput = document.getElementById('repoSearch');
+    var table = document.getElementById('reposTable');
+    var noResults = document.getElementById('noResults');
+    var rows = table.querySelectorAll('tbody tr');
+
+    searchInput.addEventListener('input', function(e) {
+        var filter = e.target.value.toLowerCase();
+        var visibleCount = 0;
+        rows.forEach(function(row) {
+            var repoName = row.querySelector('td:first-child a').textContent.toLowerCase();
+            if (repoName.includes(filter)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        table.style.display = visibleCount === 0 ? 'none' : '';
+    });
+})();
+</script>
 {{else}}
 <p>No session data found. Run a code review first.</p>
 {{end}}
